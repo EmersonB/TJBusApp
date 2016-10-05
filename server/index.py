@@ -1,7 +1,7 @@
 # flask server to create rest api
 
-from flask import Flask, request, send_from_directory
-from flask.ext.mysql import MySQL
+from flask import Flask, request
+from flaskext.mysql import MySQL
 
 
 PORT = 4000
@@ -18,7 +18,7 @@ mysql.init_app(app)
 
 @app.route('/', methods=['GET'])
 def home():
-    return send_static_file('index.html')
+    return app.send_static_file('index.html')
 
 
 @app.route('/bus/<int:bus_id>', methods=['GET', 'POST'])
@@ -59,7 +59,7 @@ def get_bus_list():
 
     date = request.form['date']
     sql = 'SELECT * FROM `assignment` WHERE `date`=%s'
-    cursor.execute(sql, (date,)
+    cursor.execute(sql, (date,))
     result = cursor.fetchall()
     conn.close()
     return result, 200
