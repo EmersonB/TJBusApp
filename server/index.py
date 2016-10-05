@@ -34,13 +34,14 @@ def update_bus(bus_id=None):
         position_id = request.form['position_id']
         last_updated = datetime.datetime.now()
 
-        sql = 'INSERT INTO `assignment` (date, bus_id, position_id, last_updated) (%s, %s, %s, %s'
+        sql = 'INSERT INTO `assignment` (date, bus_id, position_id, last_updated) (%s, %s, %s, %s)'
         cursor.execute(sql, (date, bus_id, position_id, last_updated))
         conn.commit()
         conn.close()
-        return {}, 200
+        return {"success" : "true"}, 200
 
     else:
+		#TODO also auth here - security concern
         date = request.form['date']  # TODO: fix
         sql = 'SELECT * FROM `assignment` WHERE `bus_id`=%s AND `date`=%s'
         cursor.execute(sql, (bus_id, date))
