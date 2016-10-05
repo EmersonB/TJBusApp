@@ -21,7 +21,7 @@ def home():
     return app.send_static_file('index.html')
 
 
-@app.route('/bus/<int:bus_id>', methods=['GET', 'POST'])
+@app.route('/bus/<string:bus_id>', methods=['GET', 'POST']) # ensure that all references to bus id are strings to support buses like 43A etc
 def update_bus(bus_id=None):
     if not bus_id:
         return {'error': 'Please specify a bus_id.'}, 400
