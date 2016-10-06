@@ -5,8 +5,9 @@ USE `buses`;
 CREATE TABLE `position`
 (
 	`position_id` INT NOT NULL AUTOINCREMENT,
-	`map_coordinates` TEXT,
-	`angle` DOUBLE,
+	`map_x` DOUBLE NOT NULL,
+	`map_y` DOUBLE NOT NULL,
+	`angle` DOUBLE NOT NULL,
 	`last_updated` DATETIME,
 	PRIMARY KEY (`position_id`)
 );
