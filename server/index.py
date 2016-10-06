@@ -4,9 +4,6 @@ from flask import Flask, request
 from flaskext.mysql import MySQL
 
 
-PORT = 4000
-
-
 mysql = MySQL()
 app = Flask(__name__)
 app.config['MYSQL_DATABASE_USER'] = 'username'
@@ -67,5 +64,5 @@ def get_bus_list():
 
 
 if __name__ == "__main__":
-    app.run(port=PORT)
+    app.run(port=os.getenv("PORT",5000))
 
