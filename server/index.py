@@ -1,5 +1,6 @@
 # flask server to create rest api
 
+import os
 from flask import Flask, request
 from flaskext.mysql import MySQL
 
