@@ -18,6 +18,10 @@ mysql.init_app(app)
 def home():
     return app.send_static_file('index.html')
 
+@app.route('/image', methods=['GET']) # returns the image to be used - unsure if this is necessary, but if so, will standardize image
+def image():
+	return app.send_static_file('image.png')
+
 
 @app.route('/bus/<string:bus_id>', methods=['GET', 'POST']) # ensure that all references to bus id are strings to support buses like 43A etc
 def update_bus(bus_id=None):
@@ -53,6 +57,7 @@ def update_bus(bus_id=None):
 
 @app.route('/bus', methods=['GET']) # gets all buses
 def get_bus_list():
+	# TODO auth here
     conn = mysql.connect()
     cursor = conn.cursor()
 
