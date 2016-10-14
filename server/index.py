@@ -15,7 +15,7 @@ def home():
     return app.send_static_file('index.html')
 
 @app.route('/test', methods=['GET']) #testing page
-def home():
+def test():
     return app.send_static_file('test.html')
 
 # returns the image to be used - unsure if this is necessary, but if so, will standardize image
