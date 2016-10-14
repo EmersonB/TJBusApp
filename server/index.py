@@ -4,7 +4,7 @@ import os
 from flask import Flask, request, jsonify
 from playhouse.shortcuts import model_to_dict, dict_to_model
 
-from database import Position, Bus, Assignment
+from database import Position, Bus, Assignment, db
 
 
 app = Flask(__name__)
@@ -75,6 +75,17 @@ def get_bus_list():
         print(query)
         result = list(map(model_to_dict, query))
         return jsonify(success=True, result=result), 200
+
+
+@app.before_request
+def before_request():
+    db.connect()
+
+
+@app.after_request
+def after_request(response):
+    db.close()
+    return response
 
 
 if __name__ == '__main__':
