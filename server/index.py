@@ -1,74 +1,82 @@
 # flask server to create rest api
 
 import os
-from flask import Flask, request
-from flaskext.mysql import MySQL
+from flask import Flask, request, jsonify
+from playhouse.shortcuts import model_to_dict, dict_to_model
+
+from database import Position, Bus, Assignment
 
 
-mysql = MySQL()
 app = Flask(__name__)
-app.config['MYSQL_DATABASE_USER'] = 'username'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'password'
-app.config['MYSQL_DATABASE_DB'] = 'test'
-app.config['MYSQL_DATABASE_HOST'] = 'localhost'
-mysql.init_app(app)
 
 
 @app.route('/', methods=['GET'])
 def home():
     return app.send_static_file('index.html')
 
-@app.route('/image', methods=['GET']) # returns the image to be used - unsure if this is necessary, but if so, will standardize image
+
+# returns the image to be used - unsure if this is necessary, but if so, will standardize image
+@app.route('/image', methods=['GET'])
 def image():
-	return app.send_static_file('image.png')
+    return app.send_static_file('image.png')
 
 
-@app.route('/bus/<string:bus_id>', methods=['GET', 'POST']) # ensure that all references to bus id are strings to support buses like 43A etc
-def update_bus(bus_id=None):
-    if not bus_id:
-        return {'error': 'Please specify a bus_id.'}, 400
+@app.route('/assignment/<string:bus_name>', methods=['GET', 'POST'])
+def update_assignment(bus_name=None):
+    if not bus_name:
+        return {'error': 'Please specify a bus_name.'}, 400
 
-    conn = mysql.connect()
-    cursor = conn.cursor()
     if request.method == 'POST':
         # TODO: check authentication here
         date = request.form['date']
         position_id = request.form['position_id']
-        last_updated = datetime.datetime.now()
 
-        sql = 'INSERT INTO `assignment` (date, bus_id, position_id, last_updated) (%s, %s, %s, %s)'
-        cursor.execute(sql, (date, bus_id, position_id, last_updated))
-        conn.commit()
-        conn.close()
-        return {"success" : "true"}, 200
+        obj = Assignment(
+            date=date,
+            name=bus_name,
+            position=position_id,
+            last_updated=datetime.datetime.now())
+        obj.save()
+
+        return jsonify(success=True), 200
 
     else:
-		#TODO also auth here - security concern
+        # TODO also auth here - security concern
         date = request.form['date']  # TODO: fix
-        sql = 'SELECT * FROM `assignment` WHERE `bus_id`=%s AND `date`=%s'
-        cursor.execute(sql, (bus_id, date))
-        result = cursor.fetchone()
-        conn.close()
+
+        result = Assignment.get(Assignment.bus == bus_id and Assignment.date == date)
         if result is None:
             return {'error': 'bus_id does not exist'}, 404
         else:
-            return result, 200
+            return jsonify(success=True, result=model_to_dict(result)), 200
 
 
-@app.route('/bus', methods=['GET']) # gets all buses
-def get_bus_list():
-	# TODO auth here
-    conn = mysql.connect()
-    cursor = conn.cursor()
-
+# get all bus assignments
+@app.route('/assignment', methods=['GET'])
+def get_assignment_list():
+    # TODO auth here
     date = request.form['date']
-    sql = 'SELECT * FROM `assignment` WHERE `date`=%s'
-    cursor.execute(sql, (date,))
-    result = cursor.fetchall()
-    conn.close()
-    return result, 200
+
+    query = Assignment.select().where(Assignment.date == date)
+    result = list(map(model_to_dict, query))
+    return jsonify(success=True, result=result), 200
 
 
-if __name__ == "__main__":
-    app.run(port=os.getenv("PORT",5000), host='0.0.0.0', debug=True)
+@app.route('/bus', methods=['GET', 'POST'])
+def get_bus_list():
+    if request.method == 'POST':
+        bus_name = request.form['bus_name']
+        obj = Bus(name=bus_name)
+        obj.save()
+        return jsonify(success=True), 200
+            
+    else:
+        query = Bus.select()
+        print(query)
+        result = list(map(model_to_dict, query))
+        return jsonify(success=True, result=result), 200
+
+
+if __name__ == '__main__':
+    app.run(port=os.getenv('PORT', 5000), host='0.0.0.0', debug=True)
 
