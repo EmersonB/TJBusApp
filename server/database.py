@@ -26,3 +26,19 @@ class Assignment(BaseModel):
     position = ForeignKeyField(Position)
     last_updated = DateTimeField()
 
+
+class User(BaseModel):
+    user_id = CharField(primary_key=True)
+    full_name = CharField()
+    email = CharField()
+    created_at = DateTimeField(default=datetime.datetime.now())
+    bus = ForeignKeyField(Bus)
+
+
+class AdminUser(BaseModel):
+    username = CharField(unique=True)
+    password = CharField()
+    created_at = DateTimeField(default=datetime.datetime.now())
+
+
+all_tables = [Position, Bus, Assignment, User, AdminUser]
