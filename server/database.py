@@ -13,7 +13,6 @@ class Position(BaseModel):
     map_x = DoubleField()
     map_y = DoubleField()
     angle = DoubleField()
-    last_updated = DateTimeField()
 
 
 class Bus(BaseModel):
@@ -24,12 +23,13 @@ class Assignment(BaseModel):
     date = DateField()
     bus = ForeignKeyField(Bus)
     position = ForeignKeyField(Position)
-    arrived = TimeField()
+    created = DateTimeField(default=datetime.datetime.now())
 
     class Meta:
         indexes = (
-            # a bus can have only one position per day
-            (('date', 'bus', 'position'), True),
+            # date/bus and date/position must be unique
+            (('date', 'bus'), True),
+            (('date', 'position'), True),
         )
 
 

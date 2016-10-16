@@ -1,8 +1,10 @@
 import argparse
 import bcrypt
+import datetime
 import getpass
+from playhouse.shortcuts import model_to_dict
 
-from database import db, all_tables, AdminUser, Bus
+from database import db, all_tables, AdminUser, Bus, Position
 from utils import pwhash
 
 def db_create_tables(args):
@@ -18,17 +20,23 @@ def admin_add(args):
 
 def admin_list(args):
     for admin in AdminUser.select():
-        print('id {}: {}: {}'.format(admin.id,
-            admin.username, admin.password))
+        print('id {id}: {username} / {password}'.format(**model_to_dict(admin)))
 
 def bus_add(args):
-    name = args.bus_name
-    Bus.create(name=name)
-    print('Bus {} created.'.format(name))
+    bus = Bus.create(name=args.bus_name)
+    print('Bus created with name {}'.format(bus.name))
 
 def bus_list(args):
     for bus in Bus.select():
-        print('{}'.format(bus.name))
+        print('name: {name}'.format(**model_to_dict(bus)))
+
+def position_add(args):
+    position = Position.create(map_x=args.map_x, map_y=args.map_y, angle=args.angle)
+    print('Position created with id {}'.format(position.id))
+
+def position_list(args):
+    for position in Position.select():
+        print('id {id}: map_x {map_x}, map_y {map_y}, angle {angle}'.format(**model_to_dict(position)))
 
 
 parser = argparse.ArgumentParser()
@@ -66,6 +74,20 @@ bus_parser_add.set_defaults(func=bus_add)
 
 bus_parser_list = bus_subparsers.add_parser('list', help='list all buses')
 bus_parser_list.set_defaults(func=bus_list)
+
+# begin position commands
+position_parser = subparsers.add_parser('position', help='manage positions')
+position_subparsers = position_parser.add_subparsers(dest='subcommand')
+position_subparsers.required = True
+
+position_subparser_add = position_subparsers.add_parser('add', help='add a position')
+position_subparser_add.add_argument('map_x', type=float)
+position_subparser_add.add_argument('map_y', type=float)
+position_subparser_add.add_argument('angle', type=float)
+position_subparser_add.set_defaults(func=position_add)
+
+position_subparser_list = position_subparsers.add_parser('list', help='list all positions')
+position_subparser_list.set_defaults(func=position_list)
 
 
 if __name__ == '__main__':
