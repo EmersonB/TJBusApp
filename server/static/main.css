@@ -1,0 +1,17 @@
+/* replace me when we get an actual css framework */
+
+body {
+  max-width: 50em;
+  margin: 4em auto;
+  padding: 0 1em;
+  line-height: 1.6;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #4078c0;
+  text-decoration: none;
+}
+a:hover, a:active {
+  text-decoration: underline;
+}
