@@ -7,5 +7,5 @@ def admin_required(f):
         if 'admin' in session and session['admin']:
             return f(*args, **kwargs)
         flash('You must be an admin to access that page.')
-        return redirect(url_for('.admin_login'))
+        return redirect(url_for('admin.login'))
     return decorated
