@@ -28,7 +28,7 @@ def bus_add(args):
 
 def bus_list(args):
     for bus in Bus.select():
-        print('id {}: {}'.format(bus.id, bus.name))
+        print('{}'.format(bus.name))
 
 
 parser = argparse.ArgumentParser()

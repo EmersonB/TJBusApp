@@ -9,30 +9,25 @@ from database import Position, Bus, Assignment
 
 api = Blueprint('api', __name__)
 
-@api.route('/assignment/<string:date>/<string:bus_id>', methods=['GET', 'POST'])
-def update_assignment(date, bus_id=None):
-    if not bus_id:
-        return jsonify(success=False, error='Please specify a bus_id.'), 400
+@api.route('/assignment/<string:date>/<string:bus_name>', methods=['POST'])
+@decorators.admin_required
+def update_assignment(date, bus_name):
+    position_id = request.form['position_id']
+    obj = Assignment.create(
+        date=date,
+        bus=bus_name,
+        position=position_id,
+        last_updated=datetime.datetime.now())
+    return jsonify(success=True, result=model_to_dict(obj)), 200
 
-    if request.method == 'POST':
-        # TODO: check authentication here
-        position_id = request.form['position_id']
 
-        obj = Assignment(
-            date=date,
-            bus=bus_id,
-            position=position_id,
-            last_updated=datetime.datetime.now())
-        obj.save()
-
-        return jsonify(success=True), 200
-
-    else:
-        result = Assignment.get(Assignment.bus == bus_id and Assignment.date == date)
-        if result is None:
-            return jsonify(success=False, error='bus_id does not exist'), 404
-        else:
-            return jsonify(success=True, result=model_to_dict(result)), 200
+@api.route('/assignment/<string:date>/<string:bus_name>', methods=['GET'])
+def get_assignment(date, bus_name):
+    try:
+        result = Assignment.get(Assignment.bus == bus_name, Assignment.date == date)
+        return jsonify(success=True, result=model_to_dict(result)), 200
+    except Assignment.DoesNotExist as e:
+        return jsonify(success=False, error='Assignment does not exist'), 404
 
 
 # get all bus assignments
@@ -43,16 +38,16 @@ def get_assignment_list(date):
     return jsonify(success=True, result=result), 200
 
 
-@api.route('/bus', methods=['GET', 'POST'])
-def get_bus_list():
-    if request.method == 'POST':
-        # TODO check auth!!!
-        bus_name = request.form['bus_name']
-        obj = Bus(name=bus_name)
-        obj.save()
-        return jsonify(success=True), 200
+@api.route('/bus', methods=['POST'])
+@decorators.admin_required
+def create_bus():
+    bus_name = request.form['bus_name']
+    Bus.create(name=bus_name)
+    return jsonify(success=True), 200
 
-    else:
-        query = Bus.select()
-        result = list(map(model_to_dict, query))
-        return jsonify(success=True, result=result), 200
+
+@api.route('/bus', methods=['GET'])
+def list_buses():
+    query = Bus.select()
+    result = list(map(model_to_dict, query))
+    return jsonify(success=True, result=result), 200
