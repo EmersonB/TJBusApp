@@ -14,4 +14,4 @@ def hash(password):
 def verify(password, pwhash):
     return bcrypt.checkpw(
         _sha256_base64(password),
-        pwhash)
+        pwhash.encode('utf-8'))

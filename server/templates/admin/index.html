@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+{% block body %}
+<!-- For testing purposes - form submit data -->
+<h1>Testing Page</h1>
+<form action="/bus" method="POST">
+	bus_name: <input type="text" name="bus_name" />
+	<input type="submit" />
+</form>
+<a href="/admin/logout">log me out</a>
+{% endblock %}

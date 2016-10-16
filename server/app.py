@@ -2,23 +2,21 @@
 
 import os
 import datetime
-
-from flask import Flask, request, jsonify
+from flask import Flask, request, render_template, jsonify, session, flash, redirect, url_for
 from playhouse.shortcuts import model_to_dict, dict_to_model
 
-from database import Position, Bus, Assignment, db
+from utils import pwhash, decorators
+from database import db, Position, Bus, Assignment, AdminUser
 
 
 app = Flask(__name__)
+app.secret_key = 'blah'
 
 
 @app.route('/', methods=['GET'])
 def home():
-    return app.send_static_file('index.html')
+    return render_template('index.html')
 
-@app.route('/test', methods=['GET']) #testing page
-def test():
-    return app.send_static_file('test.html')
 
 # returns the image to be used - unsure if this is necessary, but if so, will standardize image
 @app.route('/image', methods=['GET'])
@@ -68,11 +66,46 @@ def get_bus_list():
         obj = Bus(name=bus_name)
         obj.save()
         return jsonify(success=True), 200
-            
+
     else:
         query = Bus.select()
         result = list(map(model_to_dict, query))
         return jsonify(success=True, result=result), 200
+
+
+@app.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        try:
+            user = AdminUser.get(AdminUser.username == username)
+            if pwhash.verify(password, user.password):
+                session['admin'] = username
+                return redirect(url_for('.admin_home'))
+        except AdminUser.DoesNotExist:
+            pass
+
+        flash('Username/password are incorrect.')
+        return render_template('admin/login.html')
+
+    else:
+        if 'admin' in session and session['admin']:
+            flash('Warning: you are already logged in as {}'.format(session['admin']))
+        return render_template('admin/login.html')
+
+
+@app.route('/admin/logout', methods=['GET'])
+@decorators.admin_required
+def admin_logout():
+    session.pop('admin', None)
+    return redirect(url_for('.admin_login'))
+
+
+@app.route('/admin/', methods=['GET'])
+@decorators.admin_required
+def admin_home():
+    return render_template('admin/index.html')
 
 
 @app.before_request
@@ -88,4 +121,3 @@ def after_request(response):
 
 if __name__ == '__main__':
     app.run(port=os.getenv('PORT', 5000), host='0.0.0.0', debug=True)
-
