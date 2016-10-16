@@ -1,10 +1,7 @@
+import datetime
 from peewee import *
+
 db = SqliteDatabase('dev.db')
-
-
-def create_tables():
-    database.connect()
-    database.create_tables([User, Relationship, Message])
 
 
 class BaseModel(Model):
