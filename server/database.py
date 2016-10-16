@@ -17,20 +17,26 @@ class Position(BaseModel):
 
 
 class Bus(BaseModel):
-    name = CharField(unique=True)
+    name = CharField(primary_key=True)
 
 
 class Assignment(BaseModel):
     date = DateField()
     bus = ForeignKeyField(Bus)
     position = ForeignKeyField(Position)
-    last_updated = DateTimeField()
+    arrived = TimeField()
+
+    class Meta:
+        indexes = (
+            # a bus can have only one position per day
+            (('date', 'bus', 'position'), True),
+        )
 
 
 class User(BaseModel):
     user_id = CharField(primary_key=True)
     full_name = CharField()
-    email = CharField()
+    email = CharField(unique=True)
     created_at = DateTimeField(default=datetime.datetime.now())
     bus = ForeignKeyField(Bus)
 
@@ -38,7 +44,7 @@ class User(BaseModel):
 class AdminUser(BaseModel):
     username = CharField(unique=True)
     password = CharField()
-    created_at = DateTimeField(default=datetime.datetime.now())
+    created = DateTimeField(default=datetime.datetime.now())
 
 
 all_tables = [Position, Bus, Assignment, User, AdminUser]
