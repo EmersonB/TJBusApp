@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
 
 import datetime
 from flask import Blueprint, request, jsonify
@@ -64,11 +65,11 @@ def get_assignments_position(date):
 @decorators.admin_required
 def create_bus():
     bus_name = request.form['bus_name']
-	try:
+    try:
         result = Bus.create(name=bus_name)
         return jsonify(success=True, result=model_to_dict(result)), 200
     except peewee.IntegrityError:
-        return jsonify(success=False, error="bus_name already exists", 400
+        return jsonify(success=False, error="bus_name already exists"), 400
 
 
 @api.route('/bus', methods=['GET'])
