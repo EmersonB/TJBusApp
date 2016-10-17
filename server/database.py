@@ -19,9 +19,15 @@ class Bus(BaseModel):
     name = CharField(primary_key=True)
 
 
+class OrderPosition(BaseModel):
+    order = IntField()
+    position = ForeignKey(Position)
+
+
 class Assignment(BaseModel):
     date = DateField()
     bus = ForeignKeyField(Bus)
+    date_order = IntField()
     position = ForeignKeyField(Position)
     created = DateTimeField(default=datetime.datetime.now())
 
@@ -37,7 +43,7 @@ class User(BaseModel):
     user_id = CharField(primary_key=True)
     full_name = CharField()
     email = CharField(unique=True)
-    created_at = DateTimeField(default=datetime.datetime.now())
+    created = DateTimeField(default=datetime.datetime.now())
     bus = ForeignKeyField(Bus)
 
 
