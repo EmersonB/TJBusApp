@@ -57,7 +57,7 @@ def update_assignment_by_order():
 # this is for special purposes, posting by order for a certain date
 @api.route('/assignment/<string:date>/by_order', methods=['POST'])
 @decorators.admin_required
-def update_assignment_by_order(date):
+def update_assignment_by_order_with_date(date):
     bus_name = request.form['bus_name']
     order = Assignment.select(fn.COUNT(Assignment.id)).where(Assignment.date == date) + 1
     position = OrderPosition.get(OrderPosition.order == order).position
@@ -97,7 +97,7 @@ def update_assignment_by_order():
 # for specific date
 @api.route('/assignment/<string:date>/by_position', methods=['POST'])
 @decorators.admin_required
-def update_assignment_by_order(date):
+def update_assignment_by_order_with_date(date):
     bus_name = request.form['bus_name']
     order = request.form['order']
     position = OrderPosition.get(OrderPosition.order == order).position
@@ -126,7 +126,7 @@ def get_assignment_list():
 # list assignment objects for a specific date
 @api.route('/assignment/<string:date>', methods=['GET'])
 @decorators.admin_required # require admin if you request data from a different date
-def get_assignment_list(date):
+def get_assignment_list_with_date(date):
     query = (Assignment.select(Assignment)
         .where(Assignment.date == date))
         #.join(Bus, JOIN.RIGHT_OUTER))
