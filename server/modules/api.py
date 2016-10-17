@@ -64,8 +64,11 @@ def get_assignments_position(date):
 @decorators.admin_required
 def create_bus():
     bus_name = request.form['bus_name']
-    result = Bus.create(name=bus_name)
-    return jsonify(success=True, result=model_to_dict(result)), 200
+	try:
+    	result = Bus.create(name=bus_name)
+    	return jsonify(success=True, result=model_to_dict(result)), 200
+	except peewee.IntegrityError:
+		return jsonify(success=False, error="bus_name already exists", 400
 
 
 @api.route('/bus', methods=['GET'])
