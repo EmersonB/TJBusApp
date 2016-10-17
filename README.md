@@ -9,6 +9,6 @@ Most of the current activity is happening in the `server` folder. Eventually,
 the goal is to build an Android app that can interface with the API as part of
 the Mobile App Development class.
 
-we have a
+We have a
 [Google Drive folder](https://drive.google.com/drive/folders/0B4pKCnO2NaBvek5CdzBWOUgwdzg?usp=sharing)
 that we're using for planning purposes.
