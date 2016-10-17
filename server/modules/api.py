@@ -69,6 +69,48 @@ def update_assignment_by_order(date):
     return jsonify(success=True, result=model_to_dict(result)), 200
 
 
+#####################################################################################
+
+# this block is very sketchy at the moment
+
+# TODO: if bus location (mapped to arrival order) already exists
+# 1. set new bus's position to position of that order
+# 2. bump rest of buses
+# also check if there are empty slots? this is a mess
+
+# allow admin to specify order position
+@api.route('/assignment/by_position', methods=['POST'])
+@decorators.admin_required
+def update_assignment_by_order():
+    date = datetime.datetime.now().date()
+    bus_name = request.form['bus_name']
+    order = request.form['order']
+    position = OrderPosition.get(OrderPosition.order == order).position
+    result = Assignment.create(
+        date=date,
+        bus=bus_name,
+        date_order=order,
+        position=position)
+    return jsonify(success=True, result=model_to_dict(result)), 200
+
+
+# for specific date
+@api.route('/assignment/<string:date>/by_position', methods=['POST'])
+@decorators.admin_required
+def update_assignment_by_order(date):
+    bus_name = request.form['bus_name']
+    order = request.form['order']
+    position = OrderPosition.get(OrderPosition.order == order).position
+    result = Assignment.create(
+        date=date,
+        bus=bus_name,
+        date_order=order,
+        position=position)
+    return jsonify(success=True, result=model_to_dict(result)), 200
+
+#####################################################################################
+
+
 # list assignment objects
 @api.route('/assignment', methods=['GET'])
 def get_assignment_list():
