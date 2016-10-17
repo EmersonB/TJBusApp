@@ -20,16 +20,16 @@ class Bus(BaseModel):
 
 
 class OrderPosition(BaseModel):
-    order = IntField()
-    position = ForeignKey(Position)
+    order = IntegerField()
+    position = ForeignKeyField(Position)
 
 
 class Assignment(BaseModel):
     date = DateField()
     bus = ForeignKeyField(Bus)
-    date_order = IntField()
+    date_order = IntegerField(null=True)
     position = ForeignKeyField(Position)
-    created = DateTimeField(default=datetime.datetime.now())
+    arrived = DateTimeField(default=datetime.datetime.now())
 
     class Meta:
         indexes = (
