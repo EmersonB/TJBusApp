@@ -1,0 +1,1 @@
+This file is here so the client folder will commit.  Remove when there's actually stuff in this folder.
