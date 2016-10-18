@@ -15,20 +15,12 @@ api = Blueprint('api', __name__)
 @api.route('/assignment', methods=['POST'])
 @decorators.admin_required
 def update_assignment():
-    date = datetime.datetime.now().date()
-    bus_name = request.form['bus_name']
-    position_id = request.form['position_id']
-    result = Assignment.create(
-        date=date,
-        bus=bus_name,
-        position=position_id)
-    return jsonify(success=True, result=model_to_dict(result)), 200
-
+    return update_assignment_with_date(datetime.datetime.now().date())
 
 # this is for debug/special purposes, if you need to specify a date
 @api.route('/assignment/<string:date>', methods=['POST'])
 @decorators.admin_required
-def update_assignment(date):
+def update_assignment_with_date(date):
     bus_name = request.form['bus_name']
     position_id = request.form['position_id']
     result = Assignment.create(
@@ -42,16 +34,7 @@ def update_assignment(date):
 @api.route('/assignment/by_order', methods=['POST'])
 @decorators.admin_required
 def update_assignment_by_order():
-    date = datetime.datetime.now().date()
-    bus_name = request.form['bus_name']
-    order = Assignment.select(fn.COUNT(Assignment.id)).where(Assignment.date == date) + 1
-    position = OrderPosition.get(OrderPosition.order == order).position
-    result = Assignment.create(
-        date=date,
-        bus=bus_name,
-        date_order=order,
-        position=position)
-    return jsonify(success=True, result=model_to_dict(result)), 200
+    return update_assignment_by_order_with_date(datetime.datetime.now().date())
 
 
 # this is for special purposes, posting by order for a certain date
@@ -82,16 +65,7 @@ def update_assignment_by_order_with_date(date):
 @api.route('/assignment/by_position', methods=['POST'])
 @decorators.admin_required
 def update_assignment_by_order():
-    date = datetime.datetime.now().date()
-    bus_name = request.form['bus_name']
-    order = request.form['order']
-    position = OrderPosition.get(OrderPosition.order == order).position
-    result = Assignment.create(
-        date=date,
-        bus=bus_name,
-        date_order=order,
-        position=position)
-    return jsonify(success=True, result=model_to_dict(result)), 200
+    return update_assignment_by_order_with_date(datetime.datetime.now().date())
 
 
 # for specific date
@@ -114,13 +88,7 @@ def update_assignment_by_order_with_date(date):
 # list assignment objects
 @api.route('/assignment', methods=['GET'])
 def get_assignment_list():
-    date = datetime.datetime.now().date()
-    query = (Assignment.select(Assignment)
-        .where(Assignment.date == date))
-        #.join(Bus, JOIN.RIGHT_OUTER))
-        #.join(Position, JOIN.RIGHT_OUTER)
-    result = list(map(model_to_dict, query))
-    return jsonify(success=True, result=result), 200
+    return get_assignment_list_with_date(datetime.datetime.now().date())
 
 
 # list assignment objects for a specific date
