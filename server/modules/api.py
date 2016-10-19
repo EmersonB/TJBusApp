@@ -23,11 +23,14 @@ def update_assignment():
 def update_assignment_with_date(date):
     bus_name = request.form['bus_name']
     position_id = request.form['position_id']
-    result = Assignment.create(
-        date=date,
-        bus=bus_name,
-        position=position_id)
-    return jsonify(success=True, result=model_to_dict(result)), 200
+    try:
+        result = Assignment.create(
+            date=date,
+            bus=bus_name,
+            position=position_id)
+        return jsonify(success=True, result=model_to_dict(result)), 200
+    except peewee.IntegrityError: # need bus_name + date pair to be unique
+        return jsonify(success=False, error="bus_name + date pair not unique"), 400
 
 
 # standard posting a new bus by order
@@ -44,12 +47,15 @@ def update_assignment_by_order_with_date(date):
     bus_name = request.form['bus_name']
     order = Assignment.select(fn.COUNT(Assignment.id)).where(Assignment.date == date) + 1
     position = OrderPosition.get(OrderPosition.order == order).position
-    result = Assignment.create(
-        date=date,
-        bus=bus_name,
-        date_order=order,
-        position=position)
-    return jsonify(success=True, result=model_to_dict(result)), 200
+    try:
+        result = Assignment.create(
+            date=date,
+            bus=bus_name,
+            date_order=order,
+            position=position)
+        return jsonify(success=True, result=model_to_dict(result)), 200
+    except peewee.IntegrityError: # need bus_name + date pair to be unique
+        return jsonify(success=False, error="bus_name + date pair not unique"), 400
 
 
 #####################################################################################
@@ -75,12 +81,15 @@ def update_assignment_by_order_with_date(date):
     bus_name = request.form['bus_name']
     order = request.form['order']
     position = OrderPosition.get(OrderPosition.order == order).position
-    result = Assignment.create(
-        date=date,
-        bus=bus_name,
-        date_order=order,
-        position=position)
-    return jsonify(success=True, result=model_to_dict(result)), 200
+    try:
+        result = Assignment.create(
+            date=date,
+            bus=bus_name,
+            date_order=order,
+            position=position)
+        return jsonify(success=True, result=model_to_dict(result)), 200
+    except peewee.IntegrityError: # need bus_name + date pair to be unique
+        return jsonify(success=False, error="bus_name + date pair not unique"), 400
 
 #####################################################################################
 
